@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Meter Bill Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Quicksand', sans-serif;
+      margin: 0;
+      padding: 10px;
+      background-color: #f9f9f9;
+    }
+
+    h2 {
+      text-align: center;
+      margin: 20px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      overflow-x: auto;
+      display: block;
+    }
+
+    th, td {
+      border: 1px solid #aaa;
+      padding: 8px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    th {
+      background-color: #aed9e0;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 6px;
+      font-family: 'Quicksand', sans-serif;
+    }
+
+    .rate-section, .extra-charges {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    label input {
+      width: 100px;
+      margin-left: 10px;
+    }
+
+    .highlight-box {
+      border-radius: 8px;
+      padding: 15px;
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    .offpeak-table {
+      background-color: #eafaf1;
+    }
+
+    .peak-table {
+      background-color: #fff5e6;
+    }
+
+    .footer-total {
+      margin-top: 30px;
+      padding: 20px;
+      font-size: 1.3em;
+      text-align: center;
+      border-radius: 10px;
+      font-weight: bold;
+      background-color: #d1e7dd;
+      color: #0f5132;
+    }
+
+    .footer-total.negative {
+      background-color: #f8d7da;
+      color: #842029;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Meter Bill Calculator</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Reading No</th>
+      <th>Meter Tariff</th>
+      <th>Previous</th>
+      <th>Present</th>
+      <th>Units Used</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>8</td>
+      <td>Import (Off-Peak)</td>
+      <td><input type="number" step="0.01" id="prev1" value="1193.00" oninput="calcUnits(1)"></td>
+      <td><input type="number" step="0.01" id="pres1" value="1500.00" oninput="calcUnits(1)"></td>
+      <td id="units1">+307.00</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>Import (Peak)</td>
+      <td><input type="number" step="0.01" id="prev2" value="350.00" oninput="calcUnits(2)"></td>
+      <td><input type="number" step="0.01" id="pres2" value="500.00" oninput="calcUnits(2)"></td>
+      <td id="units2">+150.00</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>Export (Off-Peak)</td>
+      <td><input type="number" step="0.01" id="prev3" value="1384.00" oninput="calcUnits(3)"></td>
+      <td><input type="number" step="0.01" id="pres3" value="1707.00" oninput="calcUnits(3)"></td>
+      <td id="units3">-323.00</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>Export (Peak)</td>
+      <td><input type="number" step="0.01" id="prev4" value="0.00" oninput="calcUnits(4)"></td>
+      <td><input type="number" step="0.01" id="pres4" value="0.00" oninput="calcUnits(4)"></td>
+      <td id="units4">+0.00</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="rate-section">
+  <label>Import Off-Peak Rate: <input type="number" step="0.01" id="rate_offpeak" value="41.68" oninput="recalculateAll()"></label>
+  <label>Import Peak Rate: <input type="number" step="0.01" id="rate_peak" value="48.00" oninput="recalculateAll()"></label>
+  <label>Export Rate: <input type="number" step="0.01" id="rate_export" value="27.00" oninput="recalculateAll()"></label>
+</div>
+
+<table class="highlight-box offpeak-table">
+  <tr><td>Total Off-Peak Units</td><td><span id="offpeakUnits">0.00</span></td></tr>
+  <tr><td>Off-Peak Amount</td><td>Rs. <span id="offpeakAmount">0.00</span></td></tr>
+</table>
+
+<table class="highlight-box peak-table">
+  <tr><td>Total Peak Units</td><td><span id="peakUnits">0.00</span></td></tr>
+  <tr><td>Peak Amount</td><td>Rs. <span id="peakAmount">0.00</span></td></tr>
+</table>
+
+<div class="extra-charges">
+  <label>Fuel Adjustment Charges: <input type="number" step="0.01" id="fuel_adj" value="1000" oninput="recalculateAll()"></label>
+  <label>GST on FPA (18.23%): <input type="number" step="0.01" id="gst" value="1338" oninput="recalculateAll()"></label>
+  <label>Excise Duty (1.5%): <input type="number" step="0.01" id="excise" value="95.09" oninput="recalculateAll()"></label>
+  <label>TV Fee: <input type="number" step="0.01" id="tvfee" value="35" oninput="recalculateAll()"></label>
+</div>
+
+<div id="grandTotalBox" class="footer-total">Grand Total: Rs. 0.00</div>
+
+<script>
+  function calcUnits(index) {
+    let prev = parseFloat(document.getElementById(`prev${index}`).value) || 0;
+    let pres = parseFloat(document.getElementById(`pres${index}`).value) || 0;
+    let diff = 0;
+
+    if (index === 3) {
+      diff = (prev - pres).toFixed(2);
+    } else {
+      diff = (pres - prev).toFixed(2);
+    }
+
+    const sign = diff >= 0 ? '+' : '';
+    document.getElementById(`units${index}`).innerText = sign + diff;
+
+    recalculateAll();
+  }
+
+  function recalculateAll() {
+    let u1 = (parseFloat(document.getElementById('pres1').value) || 0) - (parseFloat(document.getElementById('prev1').value) || 0);
+    let u2 = (parseFloat(document.getElementById('pres2').value) || 0) - (parseFloat(document.getElementById('prev2').value) || 0);
+    let u3 = (parseFloat(document.getElementById('prev3').value) || 0) - (parseFloat(document.getElementById('pres3').value) || 0);
+    let u4 = (parseFloat(document.getElementById('pres4').value) || 0) - (parseFloat(document.getElementById('prev4').value) || 0);
+
+    const rate_offpeak = parseFloat(document.getElementById('rate_offpeak').value) || 0;
+    const rate_peak = parseFloat(document.getElementById('rate_peak').value) || 0;
+    const rate_export = parseFloat(document.getElementById('rate_export').value) || 0;
+
+    const totalOffPeak = u1 + u3;
+    const totalPeak = u2 + u4;
+
+    const offpeakAmount = totalOffPeak < 0
+      ? (totalOffPeak * rate_export)
+      : (totalOffPeak * rate_offpeak);
+
+    const peakAmount = totalPeak * rate_peak;
+
+    document.getElementById('offpeakUnits').innerText = (totalOffPeak >= 0 ? '+' : '') + totalOffPeak.toFixed(2);
+    document.getElementById('offpeakAmount').innerText = offpeakAmount.toFixed(2);
+
+    document.getElementById('peakUnits').innerText = (totalPeak >= 0 ? '+' : '') + totalPeak.toFixed(2);
+    document.getElementById('peakAmount').innerText = peakAmount.toFixed(2);
+
+    const fuel = parseFloat(document.getElementById('fuel_adj').value) || 0;
+    const gst = parseFloat(document.getElementById('gst').value) || 0;
+    const excise = parseFloat(document.getElementById('excise').value) || 0;
+    const tvfee = parseFloat(document.getElementById('tvfee').value) || 0;
+
+    let total = offpeakAmount + peakAmount + fuel + gst + excise + tvfee;
+    const grandBox = document.getElementById('grandTotalBox');
+
+    if (total >= 0) {
+      grandBox.classList.remove('negative');
+      grandBox.innerText = "Grand Total: Rs. " + total.toFixed(2);
+    } else {
+      grandBox.classList.add('negative');
+      grandBox.innerText = "Grand Total: Rs. " + Math.abs(total).toFixed(2) + " CR - No need to pay";
+    }
+  }
+
+  // Initial run
+  for (let i = 1; i <= 4; i++) calcUnits(i);
+</script>
+
+</body>
+</html>
